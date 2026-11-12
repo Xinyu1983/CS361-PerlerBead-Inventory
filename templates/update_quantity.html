@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Bead Quantity</title>
+</head>
+<body>
+
+    <h1>Update Bead Quantity</h1>
+
+    {% if error %}
+    <p id="error-message">{{ error }}</p>
+    {% else %}
+    <p id="error-message" hidden></p>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('update_quantity') }}">
+        <input type="hidden" name="color_code" value="{{ color_code }}">
+
+        <p>Color Code: {{ color_code }}</p>
+        <p>Current Quantity: {{ current_quantity }}</p>
+
+        <p>
+            <label for="adjustment">Adjustment Amount</label><br>
+            <input id="adjustment" type="number" step="1" min="0" value="">
+            <button type="button" id="increase">+</button>
+            <button type="button" id="decrease">-</button>
+        </p>
+
+        <p>New Quantity: <span id="new-quantity-display">{{ new_quantity }}</span></p>
+        <input type="hidden" name="new_quantity" id="new-quantity" value="{{ new_quantity }}">
+
+        <p>
+            <label for="direct-quantity">Or enter a new quantity</label><br>
+            <input id="direct-quantity" name="direct_quantity" type="text" value="{{ direct_quantity }}">
+        </p>
+
+        <p>Canceling will discard any unsaved changes.</p>
+
+        <p>
+            <button type="submit">Save Changes</button>
+            <button type="button" onclick="window.location.href='{{ url_for('inventory_page') }}'">Cancel</button>
+        </p>
+    </form>
+
+    <script>
+        var adjustmentInput = document.getElementById("adjustment");
+        var directInput = document.getElementById("direct-quantity");
+        var hiddenQuantity = document.getElementById("new-quantity");
+        var quantityDisplay = document.getElementById("new-quantity-display");
+        var errorMessage = document.getElementById("error-message");
+
+        function showError(message) {
+            if (message) {
+                errorMessage.textContent = message;
+                errorMessage.hidden = false;
+            } else {
+                errorMessage.hidden = true;
+                errorMessage.textContent = "";
+            }
+        }
+
+        function setNewQuantity(value) {
+            hiddenQuantity.value = String(value);
+            quantityDisplay.textContent = String(value);
+            if (value < 0) {
+                showError("Quantity cannot be below 0.");
+            } else {
+                showError("");
+            }
+        }
+
+        function displayedQuantity() {
+            var directValue = directInput.value.trim();
+            if (/^-?\d+$/.test(directValue)) {
+                return parseInt(directValue, 10);
+            }
+            var currentValue = hiddenQuantity.value.trim();
+            if (/^-?\d+$/.test(currentValue)) {
+                return parseInt(currentValue, 10);
+            }
+            return 0;
+        }
+
+        function readAdjustment() {
+            var text = adjustmentInput.value.trim();
+            if (!/^\d+$/.test(text)) {
+                showError("Adjustment amount must be a non-negative whole number.");
+                return null;
+            }
+            return parseInt(text, 10);
+        }
+
+        function applyAdjustment(sign) {
+            var adjustment = readAdjustment();
+            if (adjustment === null) {
+                return;
+            }
+            var nextQuantity = displayedQuantity() + (sign * adjustment);
+            directInput.value = "";
+            setNewQuantity(nextQuantity);
+        }
+
+        document.getElementById("increase").addEventListener("click", function () {
+            applyAdjustment(1);
+        });
+
+        document.getElementById("decrease").addEventListener("click", function () {
+            applyAdjustment(-1);
+        });
+
+        directInput.addEventListener("input", function () {
+            var text = directInput.value.trim();
+            if (text === "") {
+                showError("");
+                return;
+            }
+
+            if (text === "-") {
+                showError("Quantity must be a whole number.");
+                return;
+            }
+            if (/^-?\d+$/.test(text)) {
+                setNewQuantity(parseInt(text, 10));
+            } else {
+                showError("Quantity must be a whole number.");
+            }
+        });
+    </script>
+
+</body>
+</html>

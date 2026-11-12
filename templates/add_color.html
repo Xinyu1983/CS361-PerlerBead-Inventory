@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Bead Color</title>
+</head>
+<body>
+
+    <h1>Add Bead Color</h1>
+
+    <p>Add a bead color to keep your inventory accurate.</p>
+
+    {% if error %}
+    <p>{{ error }}</p>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('add_color') }}" novalidate>
+        <p>
+            <label for="color_code">Color Code</label><br>
+            <input id="color_code" name="color_code" type="text" value="{{ color_code }}">
+        </p>
+        <p>
+            <label for="quantity">Quantity</label><br>
+            <input id="quantity" name="quantity" type="text" inputmode="numeric" value="{{ quantity }}">
+        </p>
+        <p>
+            <button type="submit">Add Bead</button>
+            <button type="button" onclick="window.location.href='{{ url_for('inventory_page') }}'">Cancel</button>
+        </p>
+    </form>
+
+</body>
+</html>

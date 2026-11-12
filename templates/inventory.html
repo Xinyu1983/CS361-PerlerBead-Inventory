@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Perler Bead Inventory</title>
+</head>
+<body>
+
+    <h1>Perler Bead Inventory</h1>
+
+    <p><a href="{{ url_for('add_color') }}">+ Add Bead Color</a></p>
+
+    <h2>My Inventory</h2>
+
+    {% if inventory %}
+    <table border="1">
+        <tr>
+            <th>Color Code</th>
+            <th>Quantity</th>
+            <th>Edit</th>
+        </tr>
+        {% for color, quantity in inventory.items() %}
+        <tr>
+            <td>{{ color }}</td>
+            <td>{{ quantity }}</td>
+            <td><a href="{{ url_for('update_quantity', color_code=color) }}">Edit</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No bead colors saved yet.</p>
+    {% endif %}
+
+    <p id="load-time"></p>
+    <script>
+        window.addEventListener("load", function () {
+            var seconds = (performance.now() / 1000).toFixed(3);
+            document.getElementById("load-time").textContent = "Page loaded in " + seconds + " seconds.";
+        });
+    </script>
+
+</body>
+</html>
